@@ -43,6 +43,9 @@ router.get('/user', async (req, res) => {
     if (!authHeader) {
         return res.status(401).json({ message: 'Authorization header missing' });
     }
+    const token = authHeader.split(' ')[1];
+    console.log(token)
+    console.log(req.user)
     const user = await User.findById(req.user._id).populate('role', '_id role_name').exec();
         const userData = {
             _id: req.user._id,
