@@ -3,6 +3,7 @@ const passport = require('passport');
 const MicrosoftStrategy = require('passport-microsoft').Strategy
 const User = require('../models/User');
 const dotenv = require('dotenv');
+const jwt = require("jsonwebtoken");
 
 dotenv.config();
 
