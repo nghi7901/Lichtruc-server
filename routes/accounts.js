@@ -39,8 +39,11 @@ router.get('/auth/callback', passport.authenticate('microsoft', { failureRedirec
 });
 
 router.get('/user', async (req, res) => {
-    if (req.isAuthenticated()) {
-        const user = await User.findById(req.user._id).populate('role', '_id role_name').exec();
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).json({ message: 'Authorization header missing' });
+    }
+    const user = await User.findById(req.user._id).populate('role', '_id role_name').exec();
         const userData = {
             _id: req.user._id,
             fullName: req.user.fullName,
@@ -52,9 +55,7 @@ router.get('/user', async (req, res) => {
         res.json({
             user: userData
         });
-    } else {
-        res.status(401).json({ message: 'User not authenticated' });
-    }
+    
 });
 
 // Route để đăng xuất
