@@ -43,10 +43,19 @@ router.get('/user', async (req, res) => {
     if (!authHeader) {
         return res.status(401).json({ message: 'Authorization header missing' });
     }
-    res.json({
-        user: req.user
-    });
-
+    const user = await User.findById(req.user._id).populate('role', '_id role_name').exec();
+        const userData = {
+            _id: req.user._id,
+            fullName: req.user.fullName,
+            email: req.user.email,
+            accessToken: req.user.accessToken,
+            isActive: req.user.isActive,
+            role: user.role,
+        };
+        res.json({
+            user: userData
+        });
+    
 });
 
 // Route để đăng xuất
