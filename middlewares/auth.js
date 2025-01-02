@@ -43,12 +43,18 @@ passport.deserializeUser((user, done) => {
 });
 
 // Middleware xác thực
-const isAuthenticated = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    return next(); 
-  }
-  console.log('User not authenticated, returning 401...');
-
+const isAuthenticated = async(req, res, next) => {
+  const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).json({ message: 'Authorization header missing' });
+    }
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.decode(token);
+    console.log("Thông tin token:", decoded);
+    const user = await User.findById(decoded.oid).populate('role', '_id role_name').exec();
+    if (user) {
+      return next(); 
+    }
   // Trả về mã lỗi 401
   res.status(401).json({ message: 'Unauthorized' });
 };
