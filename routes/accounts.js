@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const dotenv = require('dotenv');
+const jwt = require("jsonwebtoken");
 
 dotenv.config();
 
@@ -44,21 +45,21 @@ router.get('/user', async (req, res) => {
         return res.status(401).json({ message: 'Authorization header missing' });
     }
     const token = authHeader.split(' ')[1];
-    console.log(token)
-    console.log(req.user)
-    const user = await User.findById(req.user._id).populate('role', '_id role_name').exec();
-        const userData = {
-            _id: req.user._id,
-            fullName: req.user.fullName,
-            email: req.user.email,
-            accessToken: req.user.accessToken,
-            isActive: req.user.isActive,
-            role: user.role,
-        };
-        res.json({
-            user: userData
-        });
-    
+    const decoded = jwt.decode(token);
+    console.log("Thông tin token:", decoded);
+    const user = await User.findById(decoded.oid).populate('role', '_id role_name').exec();
+    const userData = {
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        accessToken: user.accessToken,
+        isActive: user.isActive,
+        role: user.role,
+    };
+    res.json({
+        user: userData
+    });
+
 });
 
 // Route để đăng xuất
